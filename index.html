@@ -1381,7 +1381,7 @@ function generateResult() {
   // Render all 8 profiles
   renderAllProfiles(profileKey);
 
-  window._reportData = { name, profile, D, B, T, S };
+  window._reportData = { name, profile, profileKey, D, B, T, S };
 }
 
 function renderHero(name, profile) {
@@ -1704,6 +1704,15 @@ async function sendEmail() {
         careers: rd.profile.careers,
         business: rd.profile.business,
         bestPartners: rd.profile.bestPartners,
+        allProfiles: Object.entries(PROFILES).map(([key, p]) => ({
+          key, name: p.name, en: p.en, icon: p.icon, color: p.color,
+          energy: p.energy, tagline: p.tagline,
+          strengths: p.strengths,
+          careers: p.careers ? p.careers.slice(0,4) : [],
+          business: p.business ? p.business.slice(0,3) : [],
+          bestPartners: p.bestPartners ? p.bestPartners.map(b => b.key) : [],
+        })),
+        userProfileKey: rd.profileKey,
       }),
     });
     const result = await res.json();

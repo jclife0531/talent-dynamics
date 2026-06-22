@@ -22,7 +22,7 @@ async function saveToNotion(name, email, profileName) {
 function buildEmail(data) {
   const { name, profileName, profileEn, profileIcon, profileColor, profileColorBg,
     profileTagline, energy, D, B, T, S, desc, strengths, weaknesses,
-    strategy, famous, careers, business, bestPartners } = data;
+    strategy, famous, careers, business, bestPartners, allProfiles, userProfileKey } = data;
 
   const pc = profileColor || '#f97316';
   const pcBg = profileColorBg || 'rgba(249,115,22,0.15)';
@@ -59,7 +59,7 @@ function buildEmail(data) {
       </td></tr>
     </table>`;
 
-  const businessItems = (arr) => (arr||[]).slice(0,15).map(item =>
+  const businessItems = (arr) => (arr||[]).map(item =>
     `<div style="padding:6px 0;border-bottom:1px solid #252548;font-size:13px;color:#c0c0e0;">
       <span style="color:${pc};margin-right:6px;">▸</span>${item}
     </div>`
@@ -140,6 +140,33 @@ function buildEmail(data) {
         <div style="font-size:13px;font-weight:700;color:${pc};margin-bottom:4px;">${partnerMap[p.key]||p.key}</div>
         <div style="font-size:12px;color:#9999c0;line-height:1.7;">${p.reason}</div>
       </div>`).join('')) : ''}
+
+    <!-- All Profiles Overview -->
+    ${allProfiles && allProfiles.length ? sectionWrap('🧩 八種天才類型總覽', `
+      <div style="color:#9999c0;font-size:12px;margin-bottom:14px;line-height:1.7;">天賦原動力系統由 4 種能量組成 8 種天才類型。相鄰兩種能量的交界點形成一個類型，你被標記的類型就是你的天賦核心。</div>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+      ${allProfiles.map((p, i) => {
+        const isUser = p.key === userProfileKey;
+        const borderColor = isUser ? p.color : '#252548';
+        const bgColor = isUser ? 'rgba(255,255,255,0.04)' : '#1c1c38';
+        return `${i % 2 === 0 ? '<tr>' : ''}
+          <td width="50%" style="padding:4px ${i % 2 === 0 ? '4px 4px 0' : '0 4px 4px'};">
+            <div style="background:${bgColor};border:1px solid ${borderColor};border-radius:10px;padding:14px;position:relative;">
+              ${isUser ? `<div style="background:${p.color};color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;display:inline-block;margin-bottom:8px;">你的類型</div><br>` : ''}
+              <div style="font-size:20px;margin-bottom:4px;">${p.icon}</div>
+              <div style="font-size:14px;font-weight:700;color:${p.color};margin-bottom:2px;">${p.name}</div>
+              <div style="font-size:11px;color:#6868a0;margin-bottom:6px;">${p.en} · ${p.energy}</div>
+              <div style="font-size:11px;color:#9999c0;margin-bottom:8px;">${p.tagline}</div>
+              <div style="margin-bottom:6px;">${(p.strengths||[]).map(s => `<span style="display:inline-block;margin:2px;padding:2px 8px;border-radius:99px;font-size:10px;color:${p.color};border:1px solid ${p.color};">${s}</span>`).join('')}</div>
+              <div style="font-size:11px;color:#6868a0;font-weight:700;margin-bottom:3px;">適合職業</div>
+              <div style="font-size:11px;color:#c0c0e0;margin-bottom:6px;">${(p.careers||[]).join('・')}</div>
+            </div>
+          </td>
+        ${i % 2 === 1 ? '</tr>' : ''}`;
+      }).join('')}
+      ${allProfiles.length % 2 !== 0 ? '<td width="50%"></td></tr>' : ''}
+      </table>
+    `) : ''}
 
   </td></tr>
 
