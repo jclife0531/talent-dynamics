@@ -1653,8 +1653,11 @@ function copyReport() {
 
 function toggleBusiness(btn, color) {
   const items = document.querySelectorAll('.business-extra');
-  const isHidden = items[0]?.style.display === 'none';
-  items.forEach(el => { el.style.display = isHidden ? 'flex' : 'none'; });
+  const isHidden = items[0]?.classList.contains('hidden');
+  items.forEach(el => {
+    if (isHidden) { el.classList.remove('hidden'); el.style.display = 'flex'; }
+    else { el.classList.add('hidden'); el.style.display = 'none'; }
+  });
   btn.textContent = isHidden
     ? '－ 收起'
     : `＋ 展開查看全部 ${items.length + 10} 個方向`;
