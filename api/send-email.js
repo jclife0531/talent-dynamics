@@ -178,27 +178,25 @@ async function handleRequest(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
   const body = req.body || {};
-  const { email, name, profileName, profileEn, profileIcon, profileColor, energy } = body;
+  const { email, name, profileName, profileIcon, energy, pageHtml } = body;
   if (!email || !name) return res.status(400).json({ error: '缺少必要欄位' });
 
   const gmailUser = process.env.GMAIL_USER;
   const gmailPass = process.env.GMAIL_APP_PASSWORD;
   if (!gmailUser || !gmailPass) return res.status(500).json({ error: 'Email 服務尚未設定' });
 
-  saveToNotion(name, email, profileName).catch(() => {});
+  saveToNotion(name, email, profileName || energy).catch(() => {});
 
   const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com', port: 587, secure: false,
     auth: { user: gmailUser, pass: gmailPass },
   });
 
-  const userHtml = buildReportHtml(body);
-
   await transporter.sendMail({
     from: `"天賦原動力" <${gmailUser}>`,
     to: email,
-    subject: `${name} 的天賦原動力報告 🔥`,
-    html: userHtml,
+    subject: `${name} 的天賦原動力報告 ${profileIcon || '🔥'}`,
+    html: pageHtml || '<p>報告內容載入失敗，請重新測驗。</p>',
   });
 
   // Notify Jimmy
