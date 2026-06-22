@@ -217,16 +217,7 @@ async function handleRequest(req, res) {
     from: `"天賦原動力系統" <${gmailUser}>`,
     to: gmailUser,
     subject: `[新用戶] ${name} ｜${profileIcon} ${profileName}（${profileEn}）｜${email}`,
-    html: `<div style="font-family:sans-serif;max-width:500px;margin:auto;padding:20px;">
-      <h2 style="color:#f97316;">🔥 新用戶報告通知</h2>
-      <table style="width:100%;border-collapse:collapse;">
-        <tr style="background:#f9f9f9;"><td style="padding:10px;color:#666;width:70px;">姓名</td><td style="padding:10px;font-weight:bold;">${name}</td></tr>
-        <tr><td style="padding:10px;color:#666;">Email</td><td style="padding:10px;">${email}</td></tr>
-        <tr style="background:#f9f9f9;"><td style="padding:10px;color:#666;">類型</td><td style="padding:10px;font-weight:bold;">${profileIcon} ${profileName}（${profileEn}）</td></tr>
-        <tr><td style="padding:10px;color:#666;">主能量</td><td style="padding:10px;">${energy}</td></tr>
-        <tr style="background:#f9f9f9;"><td style="padding:10px;color:#666;">時間</td><td style="padding:10px;">${new Date().toLocaleString('zh-TW',{timeZone:'Asia/Taipei'})}</td></tr>
-      </table>
-    </div>`,
+    html: buildEmail(body),
   });
 
   return res.status(200).json({ ok: true });
