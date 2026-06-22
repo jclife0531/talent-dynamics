@@ -178,7 +178,7 @@ async function handleRequest(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
   const body = req.body || {};
-  const { email, name, profileName, profileIcon, energy, pageHtml } = body;
+  const { email, name, profileName, profileEn, profileIcon, energy, pageHtml } = body;
   if (!email || !name) return res.status(400).json({ error: '缺少必要欄位' });
 
   const gmailUser = process.env.GMAIL_USER;
