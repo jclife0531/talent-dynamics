@@ -77,7 +77,7 @@ function buildEmail(data) {
   <!-- Header -->
   <tr><td style="padding:32px 28px;text-align:center;background:#0d0d1a;border-bottom:1px solid #252548;">
     <div style="font-size:36px;margin-bottom:6px;">🔥</div>
-    <div style="color:#f97316;font-size:18px;font-weight:700;letter-spacing:5px;margin-bottom:4px;">天賦原動力</div>
+    <div style="color:#f97316;font-size:18px;font-weight:700;margin-bottom:4px;">天賦原動力</div>
     <div style="color:#6868a0;font-size:12px;">你的專屬天才類型分析報告</div>
   </td></tr>
 
