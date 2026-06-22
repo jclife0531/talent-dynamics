@@ -1,0 +1,9 @@
+{
+  "name": "talent-dynamics",
+  "version": "1.0.0",
+  "description": "天賦原動力測驗網站",
+  "private": true,
+  "dependencies": {
+    "nodemailer": "^6.9.13"
+  }
+}

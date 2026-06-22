@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>天賦原動力測驗</title>
+<style>
+  :root {
+    --bg: #0d0d1a;
+    --surface: #14142a;
+    --surface2: #1c1c38;
+    --fire: #f97316;
+    --fire-light: #fb923c;
+    --dynamo-c: #f59e0b;
+    --blaze-c: #ef4444;
+    --tempo-c: #22c55e;
+    --steel-c: #3b82f6;
+    --text: #f0f0ff;
+    --text-dim: #6868a0;
+    --border: #252548;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 15% 40%, rgba(249,115,22,0.06) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 20%, rgba(59,130,246,0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 90%, rgba(34,197,94,0.04) 0%, transparent 50%);
+  }
+
+  /* ── PARTICLES ── */
+  #particles {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+  }
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    animation: float var(--d) ease-in-out infinite;
+    opacity: 0;
+  }
+  @keyframes float {
+    0%,100% { opacity: 0; transform: translateY(0); }
+    30% { opacity: var(--o); }
+    70% { opacity: var(--o); }
+    100% { opacity: 0; transform: translateY(-30px); }
+  }
+
+  /* ── WRAPPER ── */
+  .app {
+    position: relative; z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 20px 16px 80px;
+  }
+
+  /* ── HEADER ── */
+  .logo {
+    text-align: center;
+    padding: 44px 0 28px;
+  }
+  .logo-icon {
+    font-size: 56px;
+    display: block;
+    margin-bottom: 10px;
+    filter: drop-shadow(0 0 24px rgba(249,115,22,0.6));
+    animation: pulse-logo 3s ease-in-out infinite;
+  }
+  @keyframes pulse-logo {
+    0%,100% { filter: drop-shadow(0 0 24px rgba(249,115,22,0.5)); }
+    50% { filter: drop-shadow(0 0 36px rgba(249,115,22,0.9)); }
+  }
+  .logo h1 {
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    background: linear-gradient(135deg, #f97316, #fb923c, #fbbf24);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .logo p {
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-top: 8px;
+    letter-spacing: 1px;
+  }
+
+  /* ── PROGRESS ── */
+  .progress-wrap { margin: 0 0 28px; }
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .step-label {
+    color: var(--fire);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  .step-count { color: var(--text-dim); font-size: 12px; }
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--blaze-c), var(--fire), var(--dynamo-c));
+    border-radius: 99px;
+    transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+  .card-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--fire-light);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-title .icon { font-size: 24px; }
+  .card-desc {
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.8;
+    margin-bottom: 28px;
+  }
+
+  /* ── INPUT ── */
+  input[type="text"] {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 16px;
+    color: var(--text);
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    margin-bottom: 20px;
+  }
+  input[type="text"]:focus {
+    border-color: var(--fire);
+    box-shadow: 0 0 0 3px rgba(249,115,22,0.12);
+  }
+
+  /* ── QUESTION ── */
+  .q-section-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--fire);
+    margin-bottom: 20px;
+    padding: 8px 14px;
+    background: rgba(249,115,22,0.07);
+    border-left: 3px solid var(--fire);
+    border-radius: 0 8px 8px 0;
+  }
+  .question-block {
+    margin-bottom: 28px;
+  }
+  .q-text {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 12px;
+    line-height: 1.6;
+  }
+  .q-num {
+    display: inline-block;
+    background: var(--fire);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 99px;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .options-grid {
+    display: grid;
+    gap: 8px;
+  }
+  .opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px 16px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    width: 100%;
+    font-family: inherit;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+    position: relative;
+  }
+  .opt:hover {
+    border-color: var(--fire);
+    background: rgba(249,115,22,0.06);
+    transform: translateX(3px);
+  }
+  .opt.selected {
+    border-color: var(--fire);
+    background: rgba(249,115,22,0.1);
+    box-shadow: 0 0 0 1px var(--fire);
+  }
+  .opt.selected::after {
+    content: '✓';
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--fire);
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .opt-letter {
+    min-width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--border);
+    color: var(--text-dim);
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: all 0.2s;
+  }
+  .opt.selected .opt-letter {
+    background: var(--fire);
+    color: #fff;
+  }
+  .q-divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+  /* ── BUTTONS ── */
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 12px;
+  }
+  .btn {
+    padding: 13px 30px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+    font-family: inherit;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #f97316, #fb923c);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(249,115,22,0.3);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(249,115,22,0.45); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { border-color: var(--text-dim); color: var(--text); }
+
+  /* ── ERROR ── */
+  .error-msg {
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.3);
+    color: #ef4444;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+  .hidden { display: none !important; }
+
+  /* ── RESULTS ── */
+  #results { display: none; }
+
+  .result-hero {
+    text-align: center;
+    padding: 40px 20px 36px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 36px;
+  }
+  .profile-badge {
+    display: inline-block;
+    padding: 6px 18px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
+  .result-icon { font-size: 64px; display: block; margin-bottom: 14px; }
+  .result-name {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 6px;
+    letter-spacing: 2px;
+  }
+  .result-tagline {
+    font-size: 16px;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+  .result-energy-badge {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    font-size: 13px;
+    padding: 5px 14px;
+    border-radius: 99px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+
+  /* ── ENERGY BARS ── */
+  .energy-section { margin-bottom: 36px; }
+  .energy-bars { display: flex; flex-direction: column; gap: 14px; }
+  .energy-row { display: flex; align-items: center; gap: 14px; }
+  .energy-label {
+    min-width: 80px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dim);
+  }
+  .energy-bar-wrap {
+    flex: 1;
+    height: 10px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .energy-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 1s cubic-bezier(0.4,0,0.2,1);
+  }
+  .energy-score {
+    min-width: 36px;
+    text-align: right;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  /* ── PARTNER CARDS ── */
+  .partner-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .partner-card {
+    border-radius: 10px;
+    padding: 14px;
+    border: 1px solid;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .partner-card .pc-top { display: flex; align-items: center; gap: 8px; }
+  .partner-card .pc-icon { font-size: 22px; }
+  .partner-card .pc-name { font-size: 14px; font-weight: 700; }
+  .partner-card .pc-en { font-size: 11px; opacity: 0.5; }
+  .partner-card .pc-reason { font-size: 12px; color: var(--text-dim); line-height: 1.6; }
+  .partner-places { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 4px; }
+  .partner-place-tag {
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 99px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+
+  /* ── RADAR ── */
+  #radarWrap {
+    display: flex;
+    justify-content: center;
+    margin: 8px 0 32px;
+  }
+  canvas#radar { max-width: 280px; width: 100%; }
+
+  /* ── PROFILE CARDS ── */
+  .profile-detail {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .profile-detail h3 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .profile-detail p {
+    font-size: 14px;
+    color: #c0c0e0;
+    line-height: 1.8;
+    margin-bottom: 10px;
+  }
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .tag {
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 99px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+
+  /* ── SECTION TITLE ── */
+  .section-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--fire-light);
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: linear-gradient(90deg, rgba(249,115,22,0.08) 0%, transparent 100%);
+    border-left: 3px solid var(--fire);
+    border-radius: 0 8px 8px 0;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /* ── AI ANALYSIS ── */
+  #aiAnalysis {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    line-height: 2;
+    font-size: 15px;
+    color: var(--text);
+  }
+  #aiAnalysis h3 {
+    color: var(--fire-light);
+    font-size: 16px;
+    font-weight: 700;
+    margin: 28px 0 12px;
+    padding: 8px 14px;
+    border-left: 3px solid var(--fire);
+    background: rgba(249,115,22,0.05);
+    border-radius: 0 6px 6px 0;
+    letter-spacing: 0.5px;
+  }
+  #aiAnalysis h3:first-child { margin-top: 0; }
+  #aiAnalysis p { margin-bottom: 14px; color: #c0c0e8; line-height: 2; }
+  #aiAnalysis strong { color: #fff; font-weight: 600; }
+
+  .loading-dots { display: inline-block; }
+  .loading-dots span { animation: blink 1.4s infinite; opacity: 0; }
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink { 0%,80%,100%{opacity:0} 40%{opacity:1} }
+
+  /* ── ENERGY WHEEL ── */
+  .energy-wheel-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 12px 0 32px;
+  }
+  canvas#wheel { max-width: 300px; width: 100%; }
+
+  /* ── INTRO ENERGY CARDS ── */
+  .energy-intro-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .energy-intro-card {
+    border-radius: 10px;
+    padding: 14px;
+    border: 1px solid;
+    text-align: center;
+  }
+  .energy-intro-card .e-icon { font-size: 24px; display: block; margin-bottom: 6px; }
+  .energy-intro-card .e-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .energy-intro-card .e-desc { font-size: 12px; opacity: 0.7; line-height: 1.5; }
+
+  /* ── FAMOUS PEOPLE ── */
+  .famous-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .famous-tag {
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 99px;
+    font-weight: 600;
+  }
+
+  /* ── ALL PROFILES GRID ── */
+  .all-profiles-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .all-profile-card {
+    border-radius: 12px;
+    padding: 16px;
+    border: 1.5px solid;
+    cursor: default;
+    transition: transform 0.2s;
+    position: relative;
+  }
+  .all-profile-card.is-mine {
+    box-shadow: 0 0 0 2px currentColor, 0 6px 24px rgba(0,0,0,0.4);
+    transform: scale(1.02);
+  }
+  .all-profile-card .ap-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 99px;
+    letter-spacing: 1px;
+  }
+  .all-profile-card .ap-icon { font-size: 28px; display: block; margin-bottom: 6px; }
+  .all-profile-card .ap-name { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+  .all-profile-card .ap-en { font-size: 11px; opacity: 0.6; margin-bottom: 6px; }
+  .all-profile-card .ap-energy { font-size: 11px; opacity: 0.5; margin-bottom: 8px; }
+  .all-profile-card .ap-tagline { font-size: 12px; opacity: 0.8; line-height: 1.5; }
+  .all-profile-card .ap-strengths {
+    display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px;
+  }
+  .all-profile-card .ap-tag {
+    font-size: 10px; padding: 2px 8px; border-radius: 99px;
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+    opacity: 0.7;
+  }
+
+  /* ── RWD ── */
+  @media (max-width: 600px) {
+    .app { padding: 12px 12px 70px; }
+    .logo { padding: 28px 0 20px; }
+    .logo h1 { font-size: 24px; letter-spacing: 2px; }
+    .logo-icon { font-size: 44px; }
+    .card { padding: 20px 16px; }
+    .card-title { font-size: 17px; }
+    .btn-row { flex-direction: column-reverse; gap: 8px; }
+    .btn { width: 100%; text-align: center; padding: 13px 16px; }
+    .energy-intro-grid { grid-template-columns: 1fr 1fr; }
+    input[type="text"] { font-size: 16px; }
+    .result-name { font-size: 26px; }
+    .result-icon { font-size: 52px; }
+    canvas#radar { max-width: 240px; }
+    #aiAnalysis { padding: 18px 14px; font-size: 14px; }
+    .profile-detail { padding: 18px 14px; }
+    .all-profiles-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .all-profile-card { padding: 12px; }
+    .all-profile-card .ap-icon { font-size: 22px; }
+    .all-profile-card .ap-name { font-size: 13px; }
+    .all-profile-card .ap-tagline { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="particles"></div>
+
+<div class="app">
+  <!-- LOGO -->
+  <div class="logo">
+    <span class="logo-icon">🔥</span>
+    <h1>天賦原動力</h1>
+    <p>找到你的天才類型，順流而行，輕鬆致富</p>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-info">
+      <span class="step-label" id="stepLabel">準備測驗</span>
+      <span class="step-count" id="stepCount">0 / 4</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- ══════════ STEP 0：歡迎 ══════════ -->
+  <div id="step0" class="card">
+    <div class="card-title"><span class="icon">🎯</span> 什麼是天賦原動力？</div>
+    <p class="card-desc">
+      天賦原動力（Talent Dynamics）由 Roger Hamilton 創建，幫助你找到天生最強的能量類型——然後順著它去工作、創業、賺錢。<br><br>
+      你有 <strong>4 種能量</strong>的組合，決定了你天生最擅長的事情，以及哪種工作方式讓你最輕鬆有效。
+    </p>
+
+    <div class="energy-intro-grid">
+      <div class="energy-intro-card" style="background:rgba(245,158,11,0.07);border-color:rgba(245,158,11,0.3);">
+        <span class="e-icon">⚡</span>
+        <div class="e-name" style="color:#f59e0b;">發電機 Dynamo</div>
+        <div class="e-desc">創意、點子、創新突破</div>
+      </div>
+      <div class="energy-intro-card" style="background:rgba(239,68,68,0.07);border-color:rgba(239,68,68,0.3);">
+        <span class="e-icon">🔥</span>
+        <div class="e-name" style="color:#ef4444;">火焰 Blaze</div>
+        <div class="e-desc">人際、影響力、連結</div>
+      </div>
+      <div class="energy-intro-card" style="background:rgba(34,197,94,0.07);border-color:rgba(34,197,94,0.3);">
+        <span class="e-icon">🌊</span>
+        <div class="e-name" style="color:#22c55e;">節奏 Tempo</div>
+        <div class="e-desc">穩定、時機、當下感知</div>
+      </div>
+      <div class="energy-intro-card" style="background:rgba(59,130,246,0.07);border-color:rgba(59,130,246,0.3);">
+        <span class="e-icon">🔩</span>
+        <div class="e-name" style="color:#3b82f6;">鋼鐵 Steel</div>
+        <div class="e-desc">分析、系統、數據結構</div>
+      </div>
+    </div>
+
+    <p class="card-desc" style="margin-bottom:0;">
+      這個測驗有 <strong>20 道題</strong>，每題選擇最像你的答案，大約 <strong>5–8 分鐘</strong>完成。<br>
+      沒有對錯，憑直覺選，不要想太久。
+    </p>
+
+    <div style="height:24px;"></div>
+
+    <div class="q-section-title">首先，告訴我你叫什麼名字</div>
+    <input type="text" id="userName" placeholder="輸入你的名字或暱稱" />
+    <div id="step0Error" class="error-msg hidden">請輸入你的名字 🙂</div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goStep(1)">開始測驗 →</button>
+    </div>
+  </div>
+
+  <!-- ══════════ STEP 1：Q1–Q5 ══════════ -->
+  <div id="step1" class="card hidden">
+    <div class="q-section-title">第一關 · 關於你的思維模式</div>
+    <div id="qs_1_5"></div>
+    <div id="step1Error" class="error-msg hidden">請回答所有題目後再繼續 🙏</div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="goStep(0)">← 返回</button>
+      <button class="btn btn-primary" onclick="goStep(2)">下一關 →</button>
+    </div>
+  </div>
+
+  <!-- ══════════ STEP 2：Q6–Q10 ══════════ -->
+  <div id="step2" class="card hidden">
+    <div class="q-section-title">第二關 · 關於你的工作方式</div>
+    <div id="qs_6_10"></div>
+    <div id="step2Error" class="error-msg hidden">請回答所有題目後再繼續 🙏</div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="goStep(1)">← 返回</button>
+      <button class="btn btn-primary" onclick="goStep(3)">下一關 →</button>
+    </div>
+  </div>
+
+  <!-- ══════════ STEP 3：Q11–Q15 ══════════ -->
+  <div id="step3" class="card hidden">
+    <div class="q-section-title">第三關 · 關於你的社交與決策</div>
+    <div id="qs_11_15"></div>
+    <div id="step3Error" class="error-msg hidden">請回答所有題目後再繼續 🙏</div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="goStep(2)">← 返回</button>
+      <button class="btn btn-primary" onclick="goStep(4)">下一關 →</button>
+    </div>
+  </div>
+
+  <!-- ══════════ STEP 4：Q16–Q20 ══════════ -->
+  <div id="step4" class="card hidden">
+    <div class="q-section-title">第四關 · 關於你的成功定義</div>
+    <div id="qs_16_20"></div>
+    <div id="step4Error" class="error-msg hidden">請回答所有題目後再繼續 🙏</div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="goStep(3)">← 返回</button>
+      <button class="btn btn-primary" id="analyzeBtn" onclick="generateResult()">🔥 揭曉我的天賦</button>
+    </div>
+  </div>
+
+  <!-- ══════════ RESULTS ══════════ -->
+  <div id="results">
+    <div class="card">
+      <!-- Hero -->
+      <div class="result-hero" id="resultHero"></div>
+
+      <!-- Energy Radar -->
+      <div class="section-title">⚡ 四大能量分佈</div>
+      <div id="radarWrap">
+        <canvas id="radar" width="280" height="280"></canvas>
+      </div>
+      <div class="energy-section">
+        <div class="energy-bars" id="energyBars"></div>
+      </div>
+
+      <div style="height:8px;"></div>
+
+      <!-- Profile Detail -->
+      <div class="section-title">🧬 你的天才類型解析</div>
+      <div id="profileDetail"></div>
+
+      <div style="height:16px;"></div>
+
+      <!-- 8 種天才類型總覽 -->
+      <div class="section-title">🧩 八種天才類型總覽</div>
+      <p style="color:var(--text-dim);font-size:13px;line-height:1.8;margin-bottom:20px;">
+        天賦原動力系統由 4 種能量組成 8 種天才類型，排列在一個圓形能量輪上。相鄰兩種能量組合形成一個類型，你被標記的類型就是你的天賦核心。
+      </p>
+      <div id="allProfilesGrid"></div>
+
+      <div style="height:32px;"></div>
+
+      <!-- Email Section -->
+      <div class="section-title">📩 接收你的專屬報告</div>
+      <div class="profile-detail" id="emailSection">
+        <p style="color:var(--text-dim);font-size:14px;line-height:1.8;margin-bottom:20px;">
+          輸入 Email，把這份完整報告寄到你的信箱永久珍藏。同時我們也會在報告中加入你的類型解析圖表。
+        </p>
+        <input type="email" id="userEmail" placeholder="your@email.com"
+          style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:13px 16px;color:var(--text);font-size:15px;font-family:inherit;outline:none;transition:border-color 0.2s,box-shadow 0.2s;margin-bottom:12px;"
+          onfocus="this.style.borderColor='var(--fire)';this.style.boxShadow='0 0 0 3px rgba(249,115,22,0.12)'"
+          onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'"
+        />
+        <div id="emailError" class="error-msg hidden">請輸入有效的 Email 地址 🙏</div>
+        <div id="emailSuccess" class="hidden" style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#22c55e;border-radius:8px;padding:12px 14px;font-size:14px;margin-bottom:12px;">
+          ✅ 報告已寄出！請檢查你的信箱（含垃圾郵件）。
+        </div>
+        <button class="btn btn-primary" id="sendEmailBtn" onclick="sendEmail()" style="width:100%;justify-content:center;">
+          🔥 寄送我的天賦報告
+        </button>
+      </div>
+
+      <div style="height:16px;"></div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="restart()">重新測驗</button>
+        <button class="btn btn-ghost" onclick="copyReport()">📋 複製報告</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── PARTICLES ──
+(function(){
+  const c = document.getElementById('particles');
+  const colors = ['249,115,22','239,68,68','245,158,11','59,130,246','34,197,94'];
+  for(let i=0;i<60;i++){
+    const el = document.createElement('div');
+    el.className = 'particle';
+    const size = Math.random()*3+1;
+    const color = colors[Math.floor(Math.random()*colors.length)];
+    el.style.cssText = `
+      left:${Math.random()*100}%;
+      top:${Math.random()*100}%;
+      width:${size}px; height:${size}px;
+      background:rgba(${color},${0.3+Math.random()*0.4});
+      --d:${4+Math.random()*6}s;
+      --o:${0.3+Math.random()*0.4};
+      animation-delay:${Math.random()*6}s;
+    `;
+    c.appendChild(el);
+  }
+})();
+
+// ── QUESTIONS DATA ──
+// Energy keys: D=Dynamo, B=Blaze, T=Tempo, S=Steel
+const QUESTIONS = [
+  {
+    id: 1,
+    text: '遇到一個新機會或挑戰，你的第一反應是？',
+    opts: [
+      { e:'D', text:'腦袋馬上冒出一堆點子，想趕快動手試試看' },
+      { e:'B', text:'先想要找誰合作、怎麼讓更多人知道這件事' },
+      { e:'T', text:'先觀察情況，感受一下時機再決定要不要行動' },
+      { e:'S', text:'先蒐集資料、整理資訊，做完整的規劃再說' },
+    ]
+  },
+  {
+    id: 2,
+    text: '在團隊中，你最自然扮演的角色是？',
+    opts: [
+      { e:'S', text:'整理流程、建立制度的那個人' },
+      { e:'D', text:'丟出創意方向、打破常規的那個人' },
+      { e:'B', text:'連結成員、炒熱氣氛的那個人' },
+      { e:'T', text:'穩定推進、確保大家都跟得上的那個人' },
+    ]
+  },
+  {
+    id: 3,
+    text: '什麼樣的工作讓你最有動力、最想繼續做？',
+    opts: [
+      { e:'T', text:'把一件事做到真正到位、成熟穩定' },
+      { e:'B', text:'看到別人因為你而改變，感受影響力' },
+      { e:'S', text:'找出系統性的解法，把複雜的事簡化' },
+      { e:'D', text:'創造從來沒有人做過的新東西' },
+    ]
+  },
+  {
+    id: 4,
+    text: '別人最常稱讚你的是什麼？',
+    opts: [
+      { e:'B', text:'「你好有魅力，跟你在一起感覺很好！」' },
+      { e:'S', text:'「你分析得好清楚、思路超有邏輯！」' },
+      { e:'D', text:'「你的點子好特別，我怎麼都沒想到！」' },
+      { e:'T', text:'「有你在真的很安心，做事穩穩的！」' },
+    ]
+  },
+  {
+    id: 5,
+    text: '你最享受的工作狀態是？',
+    opts: [
+      { e:'D', text:'自由探索，沒有框架和規定限制' },
+      { e:'T', text:'按自己的節奏穩定推進，不被催促' },
+      { e:'B', text:'在人群中分享、展現自己、說服他人' },
+      { e:'S', text:'一個人深入研究，不被打擾地思考' },
+    ]
+  },
+  {
+    id: 6,
+    text: '遇到問題或卡關時，你通常怎麼處理？',
+    opts: [
+      { e:'B', text:'找人聊聊，在對話中釐清方向' },
+      { e:'T', text:'先靜下來等待，觀察局勢再行動' },
+      { e:'D', text:'想出 5 個不同方法，試試看哪個有效' },
+      { e:'S', text:'深入研究根本原因，找出最佳解法' },
+    ]
+  },
+  {
+    id: 7,
+    text: '你對「計劃」的態度最接近哪一個？',
+    opts: [
+      { e:'S', text:'計劃要完整詳細，每個細節都要想清楚' },
+      { e:'D', text:'計劃不如變化，跟著感覺走最好' },
+      { e:'T', text:'按計劃走很重要，穩穩的才有安全感' },
+      { e:'B', text:'計劃是參考，更重要的是找到對的人一起做' },
+    ]
+  },
+  {
+    id: 8,
+    text: '你理想的工作環境或地點是？',
+    opts: [
+      { e:'T', text:'舒適固定的環境，變動不要太大' },
+      { e:'S', text:'安靜整潔的個人空間，可以專心思考' },
+      { e:'D', text:'任何有靈感的地方，咖啡廳、旅途中都可以' },
+      { e:'B', text:'熱鬧有人氣的地方，能跟人互動最好' },
+    ]
+  },
+  {
+    id: 9,
+    text: '你認為你最大的核心強項是？',
+    opts: [
+      { e:'D', text:'看見別人看不到的機會和可能性' },
+      { e:'S', text:'把複雜的事情條理化、系統化' },
+      { e:'B', text:'讓別人相信你、願意跟隨你的方向' },
+      { e:'T', text:'感知時機，知道什麼時候該做什麼' },
+    ]
+  },
+  {
+    id: 10,
+    text: '面對重複的日常工作，你的感受是？',
+    opts: [
+      { e:'B', text:'還好，只要還能跟人有互動就可以接受' },
+      { e:'D', text:'超無聊，我需要新鮮感和新挑戰' },
+      { e:'S', text:'可以接受，有規律邏輯的事做起來還好' },
+      { e:'T', text:'蠻喜歡的，穩定的節奏讓我有安全感' },
+    ]
+  },
+  {
+    id: 11,
+    text: '你通常是怎麼做重要決定的？',
+    opts: [
+      { e:'T', text:'慢慢等待，感覺「時機到了」自然就知道了' },
+      { e:'D', text:'跟著直覺和靈感走，再想辦法補細節' },
+      { e:'S', text:'蒐集足夠的數據和資訊後，理性分析判斷' },
+      { e:'B', text:'問問身邊信任的人，感受大家的氛圍反應' },
+    ]
+  },
+  {
+    id: 12,
+    text: '你最容易進入「心流」（完全投入忘記時間）的情境是？',
+    opts: [
+      { e:'S', text:'分析數據、建構系統、鑽研某個複雜問題' },
+      { e:'T', text:'在大自然中，或做料理、手作等體驗性活動' },
+      { e:'D', text:'在創作、寫東西、發明新概念或設計' },
+      { e:'B', text:'演講、帶領討論、與他人深度連結' },
+    ]
+  },
+  {
+    id: 13,
+    text: '你對於「賺錢」的直覺看法最接近哪個？',
+    opts: [
+      { e:'D', text:'有好點子就能創造財富，想法才是資本' },
+      { e:'T', text:'穩健累積，慢慢變多，不要冒太大風險' },
+      { e:'B', text:'人脈就是錢脈，關係對了錢就來了' },
+      { e:'S', text:'透過分析和優化系統，最大化每一分效益' },
+    ]
+  },
+  {
+    id: 14,
+    text: '你最享受哪種社交方式？',
+    opts: [
+      { e:'T', text:'跟熟悉的小圈子深度相處，不需要認識新朋友' },
+      { e:'B', text:'在大型場合認識很多新朋友，越熱鬧越好' },
+      { e:'S', text:'一對一深聊，或乾脆獨處，不喜歡大型社交' },
+      { e:'D', text:'和少數有趣的人腦力激盪，聊天馬行空的話題' },
+    ]
+  },
+  {
+    id: 15,
+    text: '你覺得自己最明顯的弱點是什麼？',
+    opts: [
+      { e:'S', text:'太完美主義，難以放手，很難讓別人做我的事' },
+      { e:'B', text:'太在乎他人眼光，容易受情緒和氣氛影響' },
+      { e:'D', text:'點子多但常常沒辦法執行到底，虎頭蛇尾' },
+      { e:'T', text:'行動太慢，有時太謹慎反而錯過好機會' },
+    ]
+  },
+  {
+    id: 16,
+    text: '你最欣賞的成功模式是哪種？',
+    opts: [
+      { e:'B', text:'靠個人魅力和影響力引領趨勢，讓別人追隨' },
+      { e:'D', text:'靠創意和創新改變遊戲規則，做別人沒做過的事' },
+      { e:'S', text:'靠精準分析和系統，把事情做到極致完美' },
+      { e:'T', text:'靠穩定累積、一步一腳印，時機到了自然豐收' },
+    ]
+  },
+  {
+    id: 17,
+    text: '對你而言，「成功」看起來最像什麼？',
+    opts: [
+      { e:'T', text:'生活穩定富足，能悠閒享受當下每一刻' },
+      { e:'S', text:'把事情做到完美，打造一個長久運作的系統' },
+      { e:'D', text:'自由地創造，做出沒有人做過的事，留下印記' },
+      { e:'B', text:'被看見、被認可，帶動了社會上的某種改變' },
+    ]
+  },
+  {
+    id: 18,
+    text: '當你處於高壓力狀態時，你通常的反應是？',
+    opts: [
+      { e:'D', text:'瘋狂想新方法，或是逃進創作世界裡' },
+      { e:'S', text:'更努力分析問題，試圖找出最完美解法' },
+      { e:'B', text:'找人傾訴，或用社交互動轉移注意力' },
+      { e:'T', text:'安靜下來，等待壓力自然過去，不強行處理' },
+    ]
+  },
+  {
+    id: 19,
+    text: '如果你有超能力，你最希望是哪一種？',
+    opts: [
+      { e:'T', text:'永遠能掌握最佳時機的能力' },
+      { e:'B', text:'讓所有人都喜歡你、信任你的能力' },
+      { e:'D', text:'能預見未來趨勢、洞察機會的能力' },
+      { e:'S', text:'能看透任何事物本質與規律的能力' },
+    ]
+  },
+  {
+    id: 20,
+    text: '別人跟你合作最大的收穫是什麼？',
+    opts: [
+      { e:'S', text:'精準的分析、完善的系統和細節把關' },
+      { e:'D', text:'源源不斷的新方向、靈感和創意突破' },
+      { e:'T', text:'可靠的節奏感、穩定推進的執行力' },
+      { e:'B', text:'廣大的連結、資源和人脈介紹' },
+    ]
+  },
+];
+
+// ── PROFILES ──
+const PARTNER_META = {
+  creator:     { icon:'💡', name:'創作者', color:'#f59e0b' },
+  star:        { icon:'⭐', name:'明星',   color:'#fbbf24' },
+  supporter:   { icon:'🤝', name:'支持者', color:'#ef4444' },
+  dealmaker:   { icon:'🎯', name:'媒合者', color:'#f97316' },
+  trader:      { icon:'⚖️', name:'商人',   color:'#22c55e' },
+  accumulator: { icon:'🌱', name:'積蓄者', color:'#10b981' },
+  lord:        { icon:'🏰', name:'地主',   color:'#3b82f6' },
+  mechanic:    { icon:'⚙️', name:'技師',   color:'#6366f1' },
+};
+const PROFILES = {
+  creator: {
+    name: '創作者',
+    en: 'Creator',
+    energy: '發電機 Dynamo',
+    energyKey: 'D',
+    icon: '💡',
+    color: '#f59e0b',
+    colorBg: 'rgba(245,158,11,0.08)',
+    colorBorder: 'rgba(245,158,11,0.3)',
+    tagline: '無中生有的創意引擎',
+    desc: '你是天生的創造者。腦袋裡永遠有源源不絕的點子，看世界的方式和別人不一樣，總能在別人看不見機會的地方發現金礦。你最強的能量是「發電機 Dynamo」，天生就是為了創造新事物而來。',
+    strengths: ['創意無窮', '看見機會', '突破框架', '啟動新局'],
+    weaknesses: ['難以收尾', '細節薄弱', '想太多做太少'],
+    flowZone: '獨立創作、品牌概念設計、新事業開創、寫作',
+    famous: ['賈伯斯', 'Lady Gaga', '馬雲', '村上春樹'],
+    strategy: '找到強大的「鋼鐵型」夥伴幫你處理細節和執行，你只負責源源不絕的創意方向。',
+    careers: ['作家／小說家','廣告創意總監','品牌策略師','藝術家／插畫家','音樂製作人','遊戲設計師','電影導演','產品概念總監','新事業開發主管','內容創作者／YouTuber','時尚設計師','建築師（概念設計）','AI 應用開發顧問','編劇／腳本作家','攝影師／視覺藝術家','發明家／專利工程師','課程與教材設計師','播客主持人','社群媒體策略師','行銷文案師','商業模式顧問','創業投資人（天使輪）','跨媒體創意總監','NFT／數位藝術創作者','前瞻趨勢研究員','企業創新主管','互動裝置設計師','潮流品牌設計師','展覽策展人','活動創意總監','料理研發師','空間概念設計師'],
+    business: ['個人 IP 知識變現（線上課程、電子書、訂閱制）','廣告創意製作公司','新媒體／自媒體品牌矩陣','創意科技新創（AI 工具、設計工具）','品牌識別設計公司','創業孵化器與加速器','線上課程教育平台','潮流聯名品牌企劃','電商選品品牌','遊戲開發工作室','獨立出版或數位雜誌','播客頻道商業化（廣告、贊助、訂閱）','NFT 或數位藝術工作室','展覽策展與文化活動公司','廣告代理商','活動策劃與體驗設計公司','創意料理或飲品品牌','藝術教育平台','VR／AR 內容工作室','跨境 IP 授權','音樂廠牌','精品旅遊體驗設計','主題概念餐廳或概念店','周邊商品開發（IP 衍生品）','創意共享工作室（空間出租）','創業陪跑顧問服務','數位產品（App、工具、模板販售）','個人電子報商業化','品牌故事影片製作公司','空間設計與室內裝修品牌','兒童創意教育品牌','跨界合作策展平台'],
+    bestPartners: [
+      { key:'lord',      reason:'地主把你的創意落地成可持續運作的系統和資產，讓點子不只停留在想法。' },
+      { key:'mechanic',  reason:'技師把你的概念打磨成完美產品，補足你不擅長的執行和細節。' },
+      { key:'supporter', reason:'支持者幫你連結受眾、建立社群，讓你的創意被更多人看見。' },
+    ],
+    partnerPlaces: ['技術創業 Meetup','Hackathon 黑客松','AI 工具社群（Discord、Slack）','設計師聚會（Behance 社群）','各大加速器 Demo Day','共同工作空間（WeWork、一卡皮箱）','創業競賽活動','LinkedIn 創業者社群','Facebook 產品設計社團'],
+  },
+  star: {
+    name: '明星',
+    en: 'Star',
+    energy: '發電機 + 火焰',
+    energyKey: 'DB',
+    icon: '⭐',
+    color: '#fbbf24',
+    colorBg: 'rgba(251,191,36,0.08)',
+    colorBorder: 'rgba(251,191,36,0.3)',
+    tagline: '舞台中央的品牌代言人',
+    desc: '你兼具創意和魅力，天生就是品牌的靈魂人物。你喜歡站上舞台、享受被看見，也有能力用自己獨特的視角帶動一群人。明星型是最適合打造個人 IP 的類型。',
+    strengths: ['個人魅力', '品牌打造', '帶動潮流', '影響力強'],
+    weaknesses: ['需要認可', '不擅細節', '容易分散'],
+    flowZone: '個人品牌、KOL、演講、直播、網紅、藝人',
+    famous: ['歐普拉', '蘋果賈伯斯', 'Elon Musk', '周杰倫'],
+    strategy: '打造屬於你的個人品牌，把你的獨特性放到最大，讓別人來找你。',
+    careers: ['KOL／網紅創作者','演說家／培訓講師','藝人／主持人','品牌創辦人（CEO）','行銷長 CMO','社群媒體總監','公關顧問','形象顧問','時尚造型師','廣播主持人','Podcast 主持人','品牌代言人','商業攝影師','直播主（帶貨）','表演藝術家','脫口秀演員','企業公關發言人','選舉競選顧問','選秀或綜藝節目製作人','個人理財教練（網路）','健身網紅','美食評論家（自媒體）','旅遊 KOL','情感或心理 KOL','親子教育自媒體','教育型 YouTuber','商業演講策展人','品牌活化顧問','跨境直播電商','TED 型演講人','奢侈品行銷顧問','娛樂經紀人'],
+    business: ['個人 IP 授權與知識付費','自媒體矩陣（YouTube、Podcast、IG、TikTok）','演講培訓與工作坊公司','品牌代言與業配媒合平台','個人品牌電商（服飾、課程、工具）','線上會員社群（付費制）','品牌顧問公司','個人形象與公關服務','網紅孵化器與 MCN 公司','選秀活動或才藝平台','教練與教育課程品牌','跨境直播電商品牌','娛樂內容公司','商業攝影與影像製作公司','品牌快閃活動策劃','健康或健身 App 自媒體','出版個人著作或電子書','演講經紀平台','個人 NFT 或數位周邊','高端個人品牌工作坊','公益形象品牌（社會企業）','親子教育品牌','寵物自媒體或品牌','女性賦權教育品牌','美食或料理品牌自媒體','奢侈品或精品聯名','電視或節目製作公司','情感或心理自媒體','B2B 個人品牌行銷培訓','播客廣告媒合平台','網路綜藝節目','明星藝人個人品牌授權'],
+    bestPartners: [
+      { key:'accumulator', reason:'積蓄者管理明星的財務和長線資產配置，讓你不只是紅，而是越來越有錢。' },
+      { key:'lord',        reason:'地主在幕後建立系統和制度，讓你只需專注在台前發光，後台一切穩定運作。' },
+      { key:'mechanic',    reason:'技師幫你把內容或產品打磨到極致品質，讓你的品牌更有深度。' },
+    ],
+    partnerPlaces: ['演講活動和 TEDx','自媒體創作者大會','品牌行銷論壇','商業峰會和創業大賽','Instagram／YouTube 創作者社群','高端社交俱樂部','線上課程平台社群（Hahow、Udemy）','LinkedIn 高端創業者群組'],
+  },
+  supporter: {
+    name: '支持者',
+    en: 'Supporter',
+    energy: '火焰 Blaze',
+    energyKey: 'B',
+    icon: '🤝',
+    color: '#ef4444',
+    colorBg: 'rgba(239,68,68,0.08)',
+    colorBorder: 'rgba(239,68,68,0.3)',
+    tagline: '讓團隊發光的連結大師',
+    desc: '你的超能力是讓人感覺被重視、被支持。你天生外向、忠誠、擅長社交，能快速跟任何人建立信任關係。當你建立起自己的團隊，整個團隊的績效可以遠超競爭對手。',
+    strengths: ['建立信任', '凝聚人心', '社交能力', '忠誠可靠'],
+    weaknesses: ['過度付出', '難以說不', '缺乏策略感'],
+    flowZone: '團隊領導、HR、客戶關係、教練、社群管理',
+    famous: ['歐巴馬', '德蕾莎修女', '王永慶'],
+    strategy: '把你的關係力和影響力放到最大，帶領一群才能比你強的人共同成就大事。',
+    careers: ['人資 HR 總監','企業教練／Life Coach','社群經理','客戶關係主管 CRM','非營利組織執行長','輔導師／心理師','教育工作者','小學或幼稚園老師','特殊教育老師','社工師','志工計畫主任','醫護人員（護士、照服員）','婚禮顧問','活動協調師','接待主任','公司行政主管','人才培育專員','員工關懷主管','輔導老師（學校）','身心靈導師','冥想引導師','瑜珈老師','個人助理／秘書','家庭調解師','社區發展主任','公益品牌大使','客服總監','教育訓練主管','企業文化顧問','導遊／旅遊陪同','運動隊教練','靈性療癒師'],
+    business: ['企業培訓與教練服務公司','付費社群平台（會員制）','HR 顧問與人才媒合公司','身心靈課程與工作坊品牌','共創學習社群','兒童教育或才藝教室','長照或銀髮照護服務','婚禮統籌服務公司','親子互動活動策劃','線上輔導或心理諮詢平台','職涯轉換陪跑課程','女性賦權教育品牌','社區型共享空間','義工媒合平台','企業員工關懷 EAP 服務','閱讀或學習社群（讀書會）','主題式旅遊（人文深度遊）','個人陪跑或教練訂閱制','非營利教育基金會','語言交換或文化交流平台','醫療或心理健康 App','靈性或身心靈工作坊品牌','高齡友善社區發展','動物或寵物關懷品牌','青少年輔導計畫','創業陪跑師社群平台','線上冥想或正念訂閱','地方創生社區事業','公益電商（每買一送一）','家長教育培訓課程','親師溝通顧問','女性互助商業社群'],
+    bestPartners: [
+      { key:'creator',  reason:'創作者給你方向和願景，你負責把人凝聚起來推動，互補讓整個計畫動起來。' },
+      { key:'mechanic', reason:'技師把你的計劃和活動系統化，讓你不需要每次都重頭來，效率大幅提升。' },
+      { key:'lord',     reason:'地主建立財務系統和後台制度，讓你專注在人的連結，不必操煩管理細節。' },
+    ],
+    partnerPlaces: ['企業內訓與人資研討會','身心靈課程和工作坊','NGO 非營利組織活動','讀書會和學習社群','Facebook 成長學習社團','宗教或靈性社群','PTT 教育版或 Dcard 學習版','志工活動招募平台'],
+  },
+  dealmaker: {
+    name: '媒合者',
+    en: 'Deal Maker',
+    energy: '火焰 + 節奏',
+    energyKey: 'BT',
+    icon: '🎯',
+    color: '#f97316',
+    colorBg: 'rgba(249,115,22,0.08)',
+    colorBorder: 'rgba(249,115,22,0.3)',
+    tagline: '把人和機會串聯在一起的橋樑',
+    desc: '你喜歡跟人接觸，但比「明星」型更重視隱私，偏好一對一或小圈子的深度互動。當你找到真正值得推薦的產品或品牌，你能把它介紹給正確的人，讓好東西發揮最大價值。',
+    strengths: ['深度連結', '一對一銷售', '判斷時機', '建立信任'],
+    weaknesses: ['不擅大場合', '過度謹慎', '人際消耗大'],
+    flowZone: '業務開發、仲介、代理人、策略合作談判',
+    famous: ['華倫巴菲特', '查理蒙格', '李嘉誠'],
+    strategy: '找到你真心相信的產品或夥伴，用你的人際深度去推動最關鍵的商業關係。',
+    careers: ['高階業務顧問','房仲經紀人','獵頭顧問 Headhunter','M&A 併購顧問','保險理財顧問','律師／談判專家','策略聯盟主管','企業外交官','品牌授權談判師','藥品或醫療器材業務','科技大廠企業業務','廣告媒體業務代表','私募股權關係經理','投資銀行業務（IBD）','創業 BD 負責人','跨國業務開發總監','政府採購顧問','房地產開發業務','電商平台招商主任','藝術品仲介','媒體版權授權','跨境貿易談判員','奢侈品客戶關係主管','移民或留學顧問','活動冠名贊助談判','藝人或網紅經紀人','合夥關係律師','稅務規劃顧問','商業調停人','政治公關與遊說顧問','國際協議談判官','特許加盟顧問'],
+    business: ['代理商或經銷商（品牌代理）','高端一對一顧問服務（Business Broker）','聯盟行銷或分潤事業','人脈型投資基金或天使俱樂部','商業媒合平台（B2B 撮合）','房地產仲介品牌','獵頭或人才媒合公司','特許加盟顧問公司','藝術品或收藏品仲介','企業版圖擴張 BD 服務','稅務或法律顧問事務所','私人理財或保險品牌','留學移民顧問公司','數位廣告代理商（媒體購買）','直銷組織（MLM）上層架構','商業撮合活動（精英聚會）','賽事或表演票務代理','政府公關或遊說公司','企業冠名贊助媒合服務','進出口貿易代理','主題社交俱樂部（高端）','授權與版權管理公司','特定產業協會創辦','商業諮詢顧問平台','行銷代理人（個人品牌）','人脈型不動產投資社群','私人健身或健康諮詢代理','名車或精品代購','慈善拍賣活動策劃','商業整合型展覽代理','精英婚姻媒合','跨國業務外包服務'],
+    bestPartners: [
+      { key:'creator',  reason:'創作者提供你不斷有新產品或新服務可以去談、去推，讓你的業務永遠有料。' },
+      { key:'lord',     reason:'地主把你談成的合作案落地成穩定系統，你負責開門，地主負責把房子蓋好。' },
+      { key:'accumulator', reason:'積蓄者評估每一筆合作的長期財務效益，幫你過濾掉看起來好但實際虧的案子。' },
+    ],
+    partnerPlaces: ['商業午餐會和精英社交俱樂部','各大產業公會和協會','BNI 商業引薦組織','高爾夫球敘或馬術等精英社交活動','LinkedIn 高階主管群組','創業投資論壇（FINDIT 等）','商業仲介網絡社群','台灣不動產相關協會活動'],
+  },
+  trader: {
+    name: '商人',
+    en: 'Trader',
+    energy: '節奏 Tempo',
+    energyKey: 'T',
+    icon: '⚖️',
+    color: '#22c55e',
+    colorBg: 'rgba(34,197,94,0.08)',
+    colorBorder: 'rgba(34,197,94,0.3)',
+    tagline: '掌握時機的最佳談判員',
+    desc: '你是最懂得「平衡」的人，天生對時機有敏銳的感知，知道什麼時候買進、什麼時候賣出。你是天生的談判員，總能找到雙方的公平點，讓每筆交易對所有人都有利。',
+    strengths: ['時機感強', '談判技巧', '公平意識', '穩定可靠'],
+    weaknesses: ['行動慢', '錯過時機', '難以快速決策'],
+    flowZone: '投資、買賣、談判、採購、資源配置',
+    famous: ['巴菲特', '索羅斯', '張忠謀'],
+    strategy: '鍛鍊你對市場節奏的感知力，在正確的時機做出買進或賣出的決斷。',
+    careers: ['股票／期貨交易員','採購總監','供應鏈管理主管','零售買手','拍賣師','資產評估師','農業或商品貿易商','外匯交易員','大宗物資採購','珠寶或古董鑑定師','藥品採購主任','進出口貿易商','零售連鎖店長','便利商店區督導','夜市或市集攤主','農場或有機農業主','跳蚤市場或二手商品商','漁業或養殖業主','珍藏品拍賣商','物流倉儲主管','農產品品管主任','縣市農會主管','農副產品加工廠主','建材或工程材料採購','能源商品交易員','碳排放額度交易商','電子零件批發商','家具或家居批發商','葡萄酒或高端飲品採購','服飾批發商','中藥材或保健品採購','寶石或礦石貿易商'],
+    business: ['買賣差價型生意（進出口、批發零售）','二手商品交易平台','農產品或原物料直銷品牌','市集或展覽活動籌辦','跨境電商選品品牌','農場直送訂閱制（CSA）','有機農業或精緻農業','夜市或攤販連鎖化','珠寶或古董仲介品牌','廢料回收再利用事業','閒置物品租借平台','季節性商品批發（節慶用品）','海鮮或肉品直銷品牌','社區型農夫市集','礦泉水或飲品批發','伴手禮或地方特產電商','二手家具或電器翻新販售','農業體驗旅遊（農遊）','寵物食品或有機飼料','在地小農品牌代理','永續食材供應鏈','進口食品或異國食材電商','茶葉或咖啡豆直購品牌','手工皂或天然保養品批發','精釀啤酒或葡萄酒直銷','農業科技（AgTech）新創','環保包材批發','文創市集策展','跳蚤市場連鎖平台','二手書或黑膠唱片店','農民保險或小額金融','量販採購服務顧問'],
+    bestPartners: [
+      { key:'star',     reason:'明星幫你的商品建立品牌形象和市場聲量，讓你的貨賣得更貴、賣得更快。' },
+      { key:'mechanic', reason:'技師幫你建立高效的進貨、庫存和物流系統，讓你的買賣更精準、損耗更低。' },
+      { key:'lord',     reason:'地主把交易流程制度化成穩定系統，讓你的生意不需要你每次親自盯著。' },
+    ],
+    partnerPlaces: ['傳統市場和批發市場','產業展覽和商展（如台北國際食品展）','農會或漁會活動','原物料或大宗物資交易所','供應鏈同業交流會','二手商品拍賣平台社群','地方商圈商家聯誼','有機農業或地方創生活動'],
+  },
+  accumulator: {
+    name: '積蓄者',
+    en: 'Accumulator',
+    energy: '節奏 + 鋼鐵',
+    energyKey: 'TS',
+    icon: '🌱',
+    color: '#10b981',
+    colorBg: 'rgba(16,185,129,0.08)',
+    colorBorder: 'rgba(16,185,129,0.3)',
+    tagline: '穩健累積資源的長線投資者',
+    desc: '你的分析能力和對時機的敏感度，讓你成為出色的資源管理者。你不追求快速爆發，而是穩健地建立資產，讓財富持續累積。你需要安靜的時間才能進入最佳狀態。',
+    strengths: ['長線思維', '資產累積', '精準分析', '風險控管'],
+    weaknesses: ['行動保守', '過度分析', '難以冒險'],
+    flowZone: '投資管理、不動產、專案管理、財務規劃',
+    famous: ['巴菲特', '比爾蓋茲', '郭台銘'],
+    strategy: '把你的分析力和穩定性用在長期投資或資產管理上，讓時間成為你最好的朋友。',
+    careers: ['基金經理人','不動產投資人','財務規劃師','稽核或風控主管','專案管理師 PMP','企業財務長 CFO','精算師','會計師（CPA）','ESG 報告分析師','商業智慧分析師 BI','統計學家','資深財報分析師','信評分析師','不動產估價師','銀行授信主管','私人銀行顧問','資產配置顧問','ETF 產品設計師','保險精算師','不動產開發顧問','退休規劃顧問','PE／VC 投資分析師','供應鏈優化顧問','合規長 CCO','風險管理主管','成本控制分析師','財務模型建構師','公司治理顧問','環境財務分析師','長期合約談判顧問','企業評估與鑑價師','資本市場融資顧問'],
+    business: ['不動產投資與出租（住宅或商業）','股票或 ETF 長期投資組合','資產管理顧問公司','財務顧問或理財規劃事務所','供應鏈優化顧問','不動產開發公司','共有產權住宅品牌','土地銀行或地主聯盟','出租型倉儲或工業廠房','太陽能電板或綠能裝置投資','退休規劃教育品牌','企業財務健診顧問','私募基金（PE）','天使投資人俱樂部','股權眾籌平台','合法放貸或小額金融公司','收藏品或藝術品投資組合','跨境房地產投資顧問','商用停車場或停車位投資','知識財產（IP）授權組合','旅館或民宿管理公司','特定地區土地整合開發','企業估值顧問事務所','碳匯或碳交易投資','基礎建設類股長期持有','ESG 投資基金','生技或醫療類股組合','傳承式家族財富管理','REITs 不動產信託研究','財經教育或投資課程品牌','企業財務外包服務','數位資產或加密貨幣長線配置'],
+    bestPartners: [
+      { key:'star',      reason:'明星的個人品牌和影響力吸引客戶和資金流入，你負責管好每一分錢的去向和效益。' },
+      { key:'supporter', reason:'支持者維繫客戶和投資人關係，讓你不需要每天應酬，只需專注數字和策略。' },
+      { key:'dealmaker', reason:'媒合者為你帶進高品質的投資機會和合作案，你負責評估哪些真的值得做。' },
+    ],
+    partnerPlaces: ['投資俱樂部和股票研究社群','不動產投資課程和社群','財富管理研討會（TIGER 21 等）','CFA 或會計師公會活動','家族辦公室交流活動','PE／VC 投資論壇','商業地產交流協會','天使投資人網絡（如 AngelList 台灣社群）'],
+  },
+  lord: {
+    name: '地主',
+    en: 'Lord',
+    energy: '鋼鐵 Steel',
+    energyKey: 'S',
+    icon: '🏰',
+    color: '#3b82f6',
+    colorBg: 'rgba(59,130,246,0.08)',
+    colorBorder: 'rgba(59,130,246,0.3)',
+    tagline: '掌控資產與系統的架構師',
+    desc: '你熱愛確定性，對處理例行事務感到自在。你的強項是建立系統、掌控資產，讓資產幫你工作。當你擁有能持續運轉的系統後，你就能擁有更多自由時間做真正想做的事。',
+    strengths: ['系統建立', '資產掌控', '細節精準', '長期穩定'],
+    weaknesses: ['缺乏彈性', '不擅社交', '抗拒改變'],
+    flowZone: '系統設計、不動產、IT 架構、財務控管、法規合規',
+    famous: ['洛克斐勒', '比爾蓋茲', '許多成功的不動產投資者'],
+    strategy: '建立能持續為你產生現金流的系統或資產，讓資產工作，而不是你一直工作。',
+    careers: ['系統架構師','IT 基礎建設主管','資料庫工程師','合規法務長','政府或公務體系主管','物業管理總監','自動化工程師','資安主管 CISO','數據工程師','ERP 系統顧問','法規顧問','企業資訊長 CIO','製造業廠務主管','設施管理主任（FM）','倉儲物流自動化主管','投資組合管理師','房地產資產管理師','水電或土木工程主管','電信基礎建設主管','金融科技後端工程師','保險精算主管','公用事業運營主管','電力或能源系統工程師','司法官或法官','法律合規審計師','內部稽核主管','研究型公務員','稅務署主管','移民署官員','海關或邊境主管','軍事或防衛系統主管','核電或能源廠站長'],
+    business: ['出租型資產（房地產、停車場、倉儲、設備）','SaaS 訂閱制軟體服務','加盟授權系統品牌','自動化數位產品（工具軟體、模板）','保險或金融商品配置事業','資料中心或主機代管服務','公有設施民間委外（BOT）','太陽能或風能電廠投資','廢水或廢棄物處理廠','物業管理公司','電信鐵塔或 5G 基地台出租','停車系統整合商','自動化倉儲物流中心','ISO 認證顧問公司','ERP 或 EMS 系統導入顧問','法遵合規顧問公司','資料保護或資安顧問','工業廠房規劃與出租','低成本長租型住宅開發','租賃設備（醫療器材、工程機具）','地下管線或電纜維護商','水資源管理事業','系統整合商（SI）','智慧城市基礎建設承包','能源管理顧問（碳盤查）','共同電表或抄表系統','政府 IT 外包工程','電子身份驗證服務','企業數位轉型基礎建設','製造業自動化顧問','IoT 設備管理平台','行政流程自動化工具（RPA）'],
+    bestPartners: [
+      { key:'star',      reason:'明星提供品牌影響力和市場聲量，讓你的系統和資產能夠被更多人認識和使用。' },
+      { key:'supporter', reason:'支持者幫你維繫人際關係和客戶服務，你不擅長的社交他全包了。' },
+      { key:'creator',   reason:'創作者帶來新想法和方向，讓你有值得建立的系統，而不是蓋一棟空城。' },
+    ],
+    partnerPlaces: ['技術大會（AWS re:Invent、Google Cloud Next）','數據分析社群（Kaggle、DataTaipei）','資安研討會（HITCON）','企業資訊長 CIO 論壇','工業技術研究院活動','政府數位轉型研討會','不動產資產管理論壇','製造業或工程師同學會'],
+  },
+  mechanic: {
+    name: '技師',
+    en: 'Mechanic',
+    energy: '鋼鐵 + 發電機',
+    energyKey: 'SD',
+    icon: '⚙️',
+    color: '#6366f1',
+    colorBg: 'rgba(99,102,241,0.08)',
+    colorBorder: 'rgba(99,102,241,0.3)',
+    tagline: '把想法變成完美系統的完成者',
+    desc: '你是「完美主義的建構者」，喜歡把別人開了頭的事做一個漂亮的收尾，然後變成一個能持續運作的系統。你最大的特徵是在任何團隊裡扮演完美主義者，確保一切精確到位。',
+    strengths: ['系統優化', '完成力強', '精準細膩', '問題解決'],
+    weaknesses: ['太完美主義', '難以授權', '過度追求細節'],
+    flowZone: '產品開發、流程優化、技術研發、品質管控',
+    famous: ['賈伯斯（後期）', 'Mark Zuckerberg', '張小龍'],
+    strategy: '找到創意型夥伴提供想法，你負責把想法打磨成完美的產品或系統。',
+    careers: ['產品經理 PM','軟體工程師','品質管控總監 QC','流程改善顧問（六標準差）','研發工程師 R&D','UX 設計師','製造業廠長','全端工程師','機器學習工程師','DevOps 工程師','CTO 技術長','精實生產顧問（Lean）','汽車工程師','航太工程師','醫療器材研發工程師','晶片設計工程師','工業設計師','自動化測試工程師','嵌入式系統工程師','機器人工程師','電路板設計師','遊戲後端工程師','資料科學家','AI 模型工程師','網路安全工程師','3D 列印技術師','精密機械工程師','建築結構工程師','食品研發工程師','製程工程師','材料科學家','品牌技術顧問（Tech Advisor）'],
+    business: ['技術產品或 App 開發','製造業或精密工業','流程優化顧問公司（六標準差、Lean）','代工或 OEM 事業','技術型 SaaS 平台','AI 工具或模型開發公司','嵌入式系統或 IoT 產品','遊戲開發工作室','醫療器材或健康科技公司','工業機器人整合商','航太或國防技術外包','半導體設備顧問','汽車零件或電動車技術','3D 列印服務或材料','精密農業或 AgTech','食品科技或細胞農業（FoodTech）','教育科技平台（EdTech）','網路安全顧問公司','自動化測試工具（QA SaaS）','技術文件或 API 文件服務','工業設計顧問','生物科技研發公司（BioTech）','再生能源技術開發','海洋科技或環境監測','機器學習顧問公司','數位雙生技術（Digital Twin）','AR／VR 工業應用','智慧製造轉型顧問','精密儀器或量測設備','材料科學新創','區塊鏈技術應用開發','技術授權或專利組合事業'],
+    bestPartners: [
+      { key:'supporter', reason:'支持者把你做出來的東西推廣給世界，幫你做行銷、做社群，讓好技術有人看見。' },
+      { key:'dealmaker', reason:'媒合者把你的技術帶進對的商業圈，找到願意買單的客戶和夥伴，加速商業化。' },
+      { key:'star',      reason:'明星為你的產品打造品牌形象，讓技術型公司不只有實力，還有魅力。' },
+    ],
+    partnerPlaces: ['Hackathon 黑客松','開源社群（GitHub、GitLab）','產品開發工作坊（ProductHunt 社群）','製造業或工程師展覽（漢諾威工業展）','技術型新創加速器','大學研究所合作計畫','工研院或科技部計畫合作','Maker Space 創客空間','技術型 LinkedIn 社群','IoT 或硬體開發者社群'],
+  },
+};
+
+// ── SCORING ──
+const scores = { D: 0, B: 0, T: 0, S: 0 };
+const answers = {};
+
+function getProfile(D, B, T, S) {
+  const sorted = [
+    {k:'D',v:D},{k:'B',v:B},{k:'T',v:T},{k:'S',v:S}
+  ].sort((a,b) => b.v - a.v);
+  const top = sorted[0].k;
+  const second = sorted[1].k;
+  const diff = sorted[0].v - sorted[1].v;
+
+  const adjacent = {
+    'D': ['B','S'],
+    'B': ['D','T'],
+    'T': ['B','S'],
+    'S': ['T','D'],
+  };
+
+  const combo = top + second;
+  const comboR = second + top;
+
+  const map = {
+    'DB':'star','BD':'star',
+    'BT':'dealmaker','TB':'dealmaker',
+    'TS':'accumulator','ST':'accumulator',
+    'SD':'mechanic','DS':'mechanic',
+  };
+
+  if (diff <= 3 && adjacent[top].includes(second)) {
+    return map[combo] || map[comboR] || pureMap(top);
+  }
+  return pureMap(top);
+}
+
+function pureMap(k) {
+  return { D:'creator', B:'supporter', T:'trader', S:'lord' }[k];
+}
+
+// ── RENDER QUESTIONS ──
+const LETTERS = ['A','B','C','D'];
+
+function renderQuestions(containerId, from, to) {
+  const container = document.getElementById(containerId);
+  let html = '';
+  for (let i = from; i <= to; i++) {
+    const q = QUESTIONS[i-1];
+    html += `<div class="question-block" id="qb_${q.id}">`;
+    html += `<div class="q-text"><span class="q-num">${q.id}</span> ${q.text}</div>`;
+    html += `<div class="options-grid" id="opts_${q.id}">`;
+    q.opts.forEach((opt, idx) => {
+      html += `<button class="opt" id="opt_${q.id}_${idx}" onclick="selectOpt(${q.id}, ${idx}, '${opt.e}')">
+        <span class="opt-letter">${LETTERS[idx]}</span>
+        <span>${opt.text}</span>
+      </button>`;
+    });
+    html += `</div></div>`;
+    if (i < to) html += `<div class="q-divider"></div>`;
+  }
+  container.innerHTML = html;
+}
+
+function selectOpt(qId, optIdx, energy) {
+  // Clear previous selection
+  const prev = answers[qId];
+  if (prev !== undefined) {
+    document.getElementById(`opt_${qId}_${prev.idx}`)?.classList.remove('selected');
+    scores[prev.e]--;
+  }
+  // Set new selection
+  document.getElementById(`opt_${qId}_${optIdx}`)?.classList.add('selected');
+  answers[qId] = { idx: optIdx, e: energy };
+  scores[energy]++;
+}
+
+// ── NAVIGATION ──
+let currentStep = 0;
+const totalSteps = 4;
+const stepLabels = ['準備測驗','思維模式','工作方式','社交決策','成功定義'];
+
+function goStep(n) {
+  if (n > currentStep) {
+    if (!validateStep(currentStep)) return;
+  }
+  document.getElementById('step'+currentStep).classList.add('hidden');
+  document.getElementById('step'+n).classList.remove('hidden');
+  currentStep = n;
+  updateProgress();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function updateProgress() {
+  const pct = (currentStep / totalSteps) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('stepLabel').textContent = stepLabels[currentStep];
+  document.getElementById('stepCount').textContent = currentStep + ' / ' + totalSteps;
+}
+
+function validateStep(n) {
+  clearErrors();
+  if (n === 0) {
+    const name = document.getElementById('userName').value.trim();
+    if (!name) { document.getElementById('step0Error').classList.remove('hidden'); return false; }
+    return true;
+  }
+  // Check all questions in range answered
+  const ranges = { 1:[1,5], 2:[6,10], 3:[11,15], 4:[16,20] };
+  if (ranges[n]) {
+    const [from, to] = ranges[n];
+    for (let i = from; i <= to; i++) {
+      if (!answers[i]) {
+        document.getElementById(`step${n}Error`).classList.remove('hidden');
+        document.getElementById(`qb_${i}`)?.scrollIntoView({behavior:'smooth', block:'center'});
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+function clearErrors() {
+  document.querySelectorAll('.error-msg').forEach(e => e.classList.add('hidden'));
+}
+
+// ── GENERATE RESULT ──
+function generateResult() {
+  clearErrors();
+  if (!validateStep(4)) return;
+
+  const name = document.getElementById('userName').value.trim();
+  const D = scores.D, B = scores.B, T = scores.T, S = scores.S;
+  const profileKey = getProfile(D, B, T, S);
+  const profile = PROFILES[profileKey];
+
+  // Hide quiz, show results
+  document.getElementById('step4').classList.add('hidden');
+  document.getElementById('progressWrap').classList.add('hidden');
+  document.getElementById('results').style.display = 'block';
+  window.scrollTo({top:0, behavior:'smooth'});
+
+  // Render hero
+  renderHero(name, profile);
+  // Render radar
+  setTimeout(() => drawRadar(D, B, T, S, profile.color), 100);
+  // Render energy bars
+  renderEnergyBars(D, B, T, S, profile.color);
+  // Render profile detail
+  renderProfileDetail(profile);
+  // Render all 8 profiles
+  renderAllProfiles(profileKey);
+
+  window._reportData = { name, profile, D, B, T, S };
+}
+
+function renderHero(name, profile) {
+  document.getElementById('resultHero').innerHTML = `
+    <div class="profile-badge" style="background:${profile.colorBg};color:${profile.color};border:1px solid ${profile.colorBorder};">
+      ${profile.energy}
+    </div><br>
+    <span class="result-icon">${profile.icon}</span>
+    <div class="result-name" style="color:${profile.color};">${profile.name}</div>
+    <div class="result-tagline">${profile.en} · ${profile.tagline}</div>
+    <div style="margin-top:10px;color:var(--text-dim);font-size:14px;">${name} 的天賦原動力報告</div>
+  `;
+}
+
+function renderEnergyBars(D, B, T, S, primaryColor) {
+  const total = D + B + T + S || 1;
+  const items = [
+    { label: '⚡ 發電機 Dynamo', val: D, color: '#f59e0b' },
+    { label: '🔥 火焰 Blaze',    val: B, color: '#ef4444' },
+    { label: '🌊 節奏 Tempo',    val: T, color: '#22c55e' },
+    { label: '🔩 鋼鐵 Steel',    val: S, color: '#3b82f6' },
+  ];
+  document.getElementById('energyBars').innerHTML = items.map(item => `
+    <div class="energy-row">
+      <div class="energy-label">${item.label}</div>
+      <div class="energy-bar-wrap">
+        <div class="energy-bar-fill" style="width:${Math.round(item.val/total*100)}%;background:${item.color};"></div>
+      </div>
+      <div class="energy-score" style="color:${item.color};">${item.val}</div>
+    </div>
+  `).join('');
+}
+
+function renderProfileDetail(profile) {
+  document.getElementById('profileDetail').innerHTML = `
+    <div class="profile-detail" style="border-color:${profile.colorBorder};background:${profile.colorBg};">
+      <h3 style="color:${profile.color};">${profile.icon} ${profile.name}（${profile.en}）的核心特質</h3>
+      <p>${profile.desc}</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div class="profile-detail">
+        <h3 style="color:var(--fire-light);">✨ 天賦優勢</h3>
+        <div class="tag-list">${profile.strengths.map(s=>`<span class="tag" style="border-color:${profile.colorBorder};color:${profile.color};">${s}</span>`).join('')}</div>
+      </div>
+      <div class="profile-detail">
+        <h3 style="color:var(--text-dim);">⚠️ 需要注意</h3>
+        <div class="tag-list">${profile.weaknesses.map(s=>`<span class="tag">${s}</span>`).join('')}</div>
+      </div>
+    </div>
+    <div class="profile-detail" style="border-color:${profile.colorBorder};">
+      <h3 style="color:${profile.color};">💼 最適合從事的職業</h3>
+      <div class="tag-list" style="margin-top:4px;">
+        ${profile.careers.map(c=>`<span class="tag" style="border-color:${profile.colorBorder};color:${profile.color};">${c}</span>`).join('')}
+      </div>
+    </div>
+    <div class="profile-detail" style="border-color:${profile.colorBorder};">
+      <h3 style="color:${profile.color};">🚀 最適合的創業方向</h3>
+      <ul style="padding-left:0;list-style:none;margin-top:4px;" id="businessList">
+        ${profile.business.map((b, i)=>`
+          <li class="${i >= 10 ? 'business-extra hidden' : ''}" style="font-size:14px;color:#c0c0e0;line-height:1.8;padding:4px 0;border-bottom:1px solid var(--border);display:${i >= 10 ? 'none' : 'flex'};align-items:center;gap:8px;">
+            <span style="color:${profile.color};font-size:12px;">▸</span>${b}
+          </li>
+        `).join('')}
+      </ul>
+      ${profile.business.length > 10 ? `
+      <button id="businessToggle" onclick="toggleBusiness(this, '${profile.color}')"
+        style="margin-top:10px;width:100%;padding:10px;background:transparent;border:1px dashed var(--border);border-radius:8px;color:var(--text-dim);font-size:13px;cursor:pointer;font-family:inherit;transition:all 0.2s;"
+        onmouseover="this.style.borderColor='${profile.color}';this.style.color='${profile.color}'"
+        onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'">
+        ＋ 展開查看全部 ${profile.business.length} 個方向
+      </button>` : ''}
+    </div>
+    <div class="profile-detail" style="border-color:${profile.colorBorder};">
+      <h3 style="color:${profile.color};">🤝 最佳合作夥伴類型</h3>
+      <p style="font-size:13px;color:var(--text-dim);margin-bottom:14px;line-height:1.7;">不同天賦類型能互補彼此的盲點。以下是和你最容易產生化學反應的天才類型：</p>
+      <div class="partner-grid">
+        ${profile.bestPartners.map(p => {
+          const m = PARTNER_META[p.key];
+          return `<div class="partner-card" style="background:rgba(255,255,255,0.03);border-color:${m.color}33;">
+            <div class="pc-top">
+              <span class="pc-icon">${m.icon}</span>
+              <div>
+                <div class="pc-name" style="color:${m.color};">${m.name}</div>
+                <div class="pc-en" style="color:${m.color};">互補指數 ★★★★★</div>
+              </div>
+            </div>
+            <div class="pc-reason">${p.reason}</div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="margin-top:14px;">
+        <div style="font-size:13px;font-weight:700;color:var(--fire-light);margin-bottom:10px;">📍 去哪裡找到這些夥伴？</div>
+        <div class="partner-places">
+          ${profile.partnerPlaces.map(pl => `<span class="partner-place-tag">${pl}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="profile-detail">
+      <h3 style="color:var(--fire-light);">👤 同類型的知名人物</h3>
+      <div class="famous-row">${profile.famous.map(f=>`<span class="famous-tag" style="background:${profile.colorBg};color:${profile.color};border:1px solid ${profile.colorBorder};">${f}</span>`).join('')}</div>
+    </div>
+    <div class="profile-detail" style="border-color:${profile.colorBorder};">
+      <h3 style="color:${profile.color};">💡 順流致富策略</h3>
+      <p style="margin-bottom:0;">${profile.strategy}</p>
+    </div>
+  `;
+}
+
+// ── RADAR CHART ──
+function drawRadar(D, B, T, S, primaryColor) {
+  const canvas = document.getElementById('radar');
+  const ctx = canvas.getContext('2d');
+  const cx = 140, cy = 140, r = 90;
+  const labels = ['⚡ Dynamo', '🔥 Blaze', '🌊 Tempo', '🔩 Steel'];
+  const angles = [Math.PI*1.5, 0, Math.PI*0.5, Math.PI];
+  const values = [D, B, T, S];
+  const colors = ['#f59e0b','#ef4444','#22c55e','#3b82f6'];
+  const max = Math.max(D, B, T, S) || 1;
+
+  ctx.clearRect(0,0,280,280);
+
+  // Grid
+  for(let i=1;i<=4;i++){
+    ctx.beginPath();
+    ctx.arc(cx,cy,r*(i/4),0,Math.PI*2);
+    ctx.strokeStyle = 'rgba(37,37,72,1)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Axes
+  angles.forEach(a=>{
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.lineTo(cx+Math.cos(a)*r, cy+Math.sin(a)*r);
+    ctx.strokeStyle = 'rgba(37,37,72,1)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  // Data fill
+  ctx.beginPath();
+  values.forEach((v,i)=>{
+    const ratio = v / (max * 1.1);
+    const x = cx + Math.cos(angles[i])*r*ratio;
+    const y = cy + Math.sin(angles[i])*r*ratio;
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.closePath();
+  ctx.fillStyle = primaryColor + '22';
+  ctx.fill();
+  ctx.strokeStyle = primaryColor + 'aa';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Data points
+  values.forEach((v,i)=>{
+    const ratio = v / (max * 1.1);
+    const x = cx + Math.cos(angles[i])*r*ratio;
+    const y = cy + Math.sin(angles[i])*r*ratio;
+    ctx.beginPath();
+    ctx.arc(x,y,5,0,Math.PI*2);
+    ctx.fillStyle = colors[i];
+    ctx.fill();
+    ctx.strokeStyle = '#0d0d1a';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  });
+
+  // Labels
+  labels.forEach((l,i)=>{
+    const x = cx + Math.cos(angles[i])*(r+24);
+    const y = cy + Math.sin(angles[i])*(r+24);
+    ctx.fillStyle = colors[i];
+    ctx.font = 'bold 11px system-ui';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(l, x, y);
+  });
+}
+
+// ── ALL 8 PROFILES GRID ──
+// Wheel order: Creator → Star → Supporter → DealMaker → Trader → Accumulator → Lord → Mechanic
+const WHEEL_ORDER = ['creator','star','supporter','dealmaker','trader','accumulator','lord','mechanic'];
+
+function renderAllProfiles(myKey) {
+  const container = document.getElementById('allProfilesGrid');
+  const html = `
+    <div class="all-profiles-grid">
+      ${WHEEL_ORDER.map(key => {
+        const p = PROFILES[key];
+        const isMine = key === myKey;
+        return `
+          <div class="all-profile-card ${isMine ? 'is-mine' : ''}"
+               style="background:${p.colorBg};border-color:${isMine ? p.color : p.colorBorder};color:${p.color};">
+            ${isMine ? `<span class="ap-badge" style="background:${p.color};color:#000;">你的類型</span>` : ''}
+            <span class="ap-icon">${p.icon}</span>
+            <div class="ap-name">${p.name}</div>
+            <div class="ap-en">${p.en}</div>
+            <div class="ap-energy" style="color:${p.color};">主能量：${p.energy}</div>
+            <div class="ap-tagline" style="color:var(--text-dim);">${p.tagline}</div>
+            <div class="ap-strengths">
+              ${p.strengths.map(s => `<span class="ap-tag">${s}</span>`).join('')}
+            </div>
+            <div style="margin-top:10px;border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;">
+              <div style="font-size:10px;color:${p.color};font-weight:700;letter-spacing:1px;margin-bottom:5px;">適合職業</div>
+              <div style="font-size:11px;color:var(--text-dim);line-height:1.7;">${p.careers.slice(0,3).join('・')}</div>
+            </div>
+            <div style="margin-top:7px;">
+              <div style="font-size:10px;color:${p.color};font-weight:700;letter-spacing:1px;margin-bottom:5px;">創業方向</div>
+              <div style="font-size:11px;color:var(--text-dim);line-height:1.7;">${p.business.slice(0,2).join('・')}</div>
+            </div>
+            <div style="margin-top:7px;border-top:1px solid rgba(255,255,255,0.06);padding-top:7px;">
+              <div style="font-size:10px;color:${p.color};font-weight:700;letter-spacing:1px;margin-bottom:5px;">最佳夥伴</div>
+              <div style="font-size:11px;color:var(--text-dim);line-height:1.7;">${p.bestPartners.map(b=>PARTNER_META[b.key].icon+' '+PARTNER_META[b.key].name).join('・')}</div>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+    <div style="text-align:center;margin-top:12px;color:var(--text-dim);font-size:12px;line-height:1.8;">
+      能量輪順序：發電機 ⚡ → 火焰 🔥 → 節奏 🌊 → 鋼鐵 🔩 → 再回到發電機<br>
+      相鄰兩種能量的交界點形成一個天才類型，共 8 種
+    </div>
+  `;
+  container.innerHTML = html;
+}
+
+// ── AI ANALYSIS ──
+async function callAI(name, profile, D, B, T, S) {
+  const aiEl = document.getElementById('aiAnalysis');
+  aiEl.innerHTML = '<div class="loading-dots">AI 正在深度解讀你的天賦原動力<span>.</span><span>.</span><span>.</span></div>';
+
+  try {
+    const res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ name, profile: profile.name, profileEn: profile.en, energy: profile.energy, D, B, T, S, tagline: profile.tagline }),
+    });
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error || '呼叫失敗');
+    const text = result.text || '';
+    window._reportText = `${name} 的天賦原動力報告\n天才類型：${profile.name}（${profile.en}）\n\n${text}`;
+    aiEl.innerHTML = renderMarkdown(text);
+  } catch(err) {
+    aiEl.innerHTML = `<div style="color:var(--text-dim);padding:16px;font-size:14px;">AI 解讀暫時無法使用，請稍後再試。</div>`;
+  }
+}
+
+function renderMarkdown(text) {
+  return text
+    .replace(/^## (.+)$/gm, '<h3>$1</h3>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>')
+    .replace(/^/, '<p>')
+    .replace(/$/, '</p>');
+}
+
+function copyReport() {
+  if (!window._reportText) return;
+  navigator.clipboard.writeText(window._reportText).then(() => {
+    const btn = event.target;
+    const orig = btn.textContent;
+    btn.textContent = '✅ 已複製！';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  });
+}
+
+function toggleBusiness(btn, color) {
+  const items = document.querySelectorAll('.business-extra');
+  const isHidden = items[0]?.style.display === 'none';
+  items.forEach(el => { el.style.display = isHidden ? 'flex' : 'none'; });
+  btn.textContent = isHidden
+    ? '－ 收起'
+    : `＋ 展開查看全部 ${items.length + 10} 個方向`;
+}
+
+async function sendEmail() {
+  const email = document.getElementById('userEmail').value.trim();
+  const errEl = document.getElementById('emailError');
+  const sucEl = document.getElementById('emailSuccess');
+  const btn = document.getElementById('sendEmailBtn');
+
+  errEl.classList.add('hidden');
+  sucEl.classList.add('hidden');
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errEl.classList.remove('hidden');
+    return;
+  }
+
+  const rd = window._reportData;
+  if (!rd) return;
+
+  btn.disabled = true;
+  btn.textContent = '寄送中...';
+
+  try {
+    const res = await fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        name: rd.name,
+        profileName: rd.profile.name,
+        profileEn: rd.profile.en,
+        profileIcon: rd.profile.icon,
+        profileColor: rd.profile.color,
+        profileColorBg: rd.profile.colorBg,
+        profileColorBorder: rd.profile.colorBorder,
+        profileTagline: rd.profile.tagline,
+        energy: rd.profile.energy,
+        D: rd.D, B: rd.B, T: rd.T, S: rd.S,
+        desc: rd.profile.desc,
+        strengths: rd.profile.strengths,
+        weaknesses: rd.profile.weaknesses,
+        strategy: rd.profile.strategy,
+        famous: rd.profile.famous,
+        careers: rd.profile.careers,
+        business: rd.profile.business,
+        bestPartners: rd.profile.bestPartners,
+      }),
+    });
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error || '寄送失敗');
+    sucEl.classList.remove('hidden');
+    btn.textContent = '✅ 已寄出';
+  } catch (err) {
+    errEl.textContent = `寄送失敗：${err.message}`;
+    errEl.classList.remove('hidden');
+    btn.disabled = false;
+    btn.textContent = '🔥 寄送我的天賦報告';
+  }
+}
+
+function restart() {
+  if (confirm('確定要重新測驗嗎？所有答案都會清除。')) location.reload();
+}
+
+// ── INIT ──
+renderQuestions('qs_1_5', 1, 5);
+renderQuestions('qs_6_10', 6, 10);
+renderQuestions('qs_11_15', 11, 15);
+renderQuestions('qs_16_20', 16, 20);
+updateProgress();
+</script>
+</body>
+</html>
