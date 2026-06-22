@@ -1681,19 +1681,6 @@ async function sendEmail() {
   btn.textContent = '寄送中...';
 
   try {
-    // 抓取結果頁面 CSS + HTML
-    const styles = Array.from(document.styleSheets).map(s => {
-      try { return Array.from(s.cssRules).map(r => r.cssText).join('\n'); } catch(e) { return ''; }
-    }).join('\n');
-    const resultsEl = document.getElementById('results');
-    // 隱藏 email 輸入區再抓 HTML，避免帶進去
-    const emailSection = document.getElementById('emailSection');
-    if (emailSection) emailSection.style.display = 'none';
-    const resultsHtml = resultsEl ? resultsEl.innerHTML : '';
-    if (emailSection) emailSection.style.display = '';
-
-    const pageHtml = `<!DOCTYPE html><html lang="zh-TW"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;padding:16px;background:#0d0d1a;font-family:'Segoe UI',Arial,sans-serif;}${styles}</style></head><body><div id="results">${resultsHtml}</div></body></html>`;
-
     const res = await fetch('/api/send-email', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -1703,8 +1690,20 @@ async function sendEmail() {
         profileName: rd.profile.name,
         profileEn: rd.profile.en,
         profileIcon: rd.profile.icon,
+        profileColor: rd.profile.color,
+        profileColorBg: rd.profile.colorBg,
+        profileColorBorder: rd.profile.colorBorder,
+        profileTagline: rd.profile.tagline,
         energy: rd.profile.energy,
-        pageHtml,
+        D: rd.D, B: rd.B, T: rd.T, S: rd.S,
+        desc: rd.profile.desc,
+        strengths: rd.profile.strengths,
+        weaknesses: rd.profile.weaknesses,
+        strategy: rd.profile.strategy,
+        famous: rd.profile.famous,
+        careers: rd.profile.careers,
+        business: rd.profile.business,
+        bestPartners: rd.profile.bestPartners,
       }),
     });
     const result = await res.json();
