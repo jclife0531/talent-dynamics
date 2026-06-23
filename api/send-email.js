@@ -2,9 +2,9 @@ import nodemailer from 'nodemailer';
 
 async function saveToNotion(name, email, profileName) {
   const token = process.env.NOTION_TOKEN;
-  if (!token) return;
+  if (!token) { console.error('[Notion] 缺少 NOTION_TOKEN'); return; }
   const DB_ID = process.env.NOTION_DB_TALENT_ID || '9f709fada2b144a58322beaee4cf6dda';
-  await fetch('https://api.notion.com/v1/pages', {
+  const res = await fetch('https://api.notion.com/v1/pages', {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', 'Notion-Version': '2022-06-28' },
     body: JSON.stringify({
@@ -17,6 +17,9 @@ async function saveToNotion(name, email, profileName) {
       },
     }),
   });
+  const data = await res.json();
+  if (!res.ok) console.error('[Notion] 寫入失敗:', JSON.stringify(data));
+  else console.log('[Notion] 寫入成功:', data.id);
 }
 
 function buildEmail(data) {
