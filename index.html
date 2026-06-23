@@ -59,6 +59,30 @@
     padding: 20px 16px 80px;
   }
 
+  /* ── STICKY HEADER ── */
+  .sticky-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(10, 10, 26, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(249,115,22,0.15);
+    padding: 0 16px;
+  }
+  .sticky-header .logo {
+    padding: 10px 0 4px;
+  }
+  .sticky-header .logo-icon { font-size: 28px; margin-bottom: 4px; }
+  .sticky-header .logo h1 { font-size: 18px; letter-spacing: 2px; }
+  .sticky-header .logo p { font-size: 11px; margin-top: 2px; }
+  .sticky-header .progress-wrap {
+    margin: 0 0 10px;
+  }
+  .app { padding-top: 140px; }
+
   /* ── HEADER ── */
   .logo {
     text-align: center;
@@ -615,15 +639,13 @@
 
 <div id="particles"></div>
 
-<div class="app">
-  <!-- LOGO -->
+<!-- STICKY HEADER -->
+<div class="sticky-header">
   <div class="logo">
     <span class="logo-icon">🔥</span>
     <h1>天賦原動力</h1>
     <p>找到你的天才類型，順流而行，輕鬆致富</p>
   </div>
-
-  <!-- PROGRESS -->
   <div class="progress-wrap" id="progressWrap">
     <div class="progress-info">
       <span class="step-label" id="stepLabel">準備測驗</span>
@@ -633,6 +655,9 @@
       <div class="progress-fill" id="progressFill" style="width:0%"></div>
     </div>
   </div>
+</div>
+
+<div class="app">
 
   <!-- ══════════ STEP 0：歡迎 ══════════ -->
   <div id="step0" class="card">
